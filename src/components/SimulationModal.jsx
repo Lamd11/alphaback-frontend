@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { runSimulation, getDefaultSimulationParams } from '../services/simulateService';
 import './SimulationModal.css';
 
-function SimulationModal({ model, onClose }) {
+function SimulationModal({ model, onClose, onSimulationComplete }) {
   const [simulating, setSimulating] = useState(false);
-  const [results, setResults] = useState(null);
   const [error, setError] = useState('');
   const [params, setParams] = useState(getDefaultSimulationParams());
 
@@ -12,10 +11,12 @@ function SimulationModal({ model, onClose }) {
     try {
       setSimulating(true);
       setError('');
-      setResults(null);
 
       const data = await runSimulation(model.model_id, params);
-      setResults(data);
+
+      // Pass results back and close modal
+      onSimulationComplete(data, params.symbols);
+      onClose();
     } catch (err) {
       console.error('Simulation error:', err);
       setError(
@@ -23,7 +24,6 @@ function SimulationModal({ model, onClose }) {
         err.message ||
         'Simulation failed. Please try again.'
       );
-    } finally {
       setSimulating(false);
     }
   };
@@ -109,15 +109,6 @@ function SimulationModal({ model, onClose }) {
           {error && (
             <div className="error-box">
               {error}
-            </div>
-          )}
-
-          {results && (
-            <div className="results-section">
-              <h3>Simulation Results</h3>
-              <div className="raw-results">
-                <pre>{JSON.stringify(results, null, 2)}</pre>
-              </div>
             </div>
           )}
         </div>

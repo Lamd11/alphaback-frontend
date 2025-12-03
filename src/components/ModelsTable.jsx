@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchModels, getModelName } from '../services/modelService';
 import SimulationModal from './SimulationModal';
+import SimulationResults from './SimulationResults';
 import './ModelsTable.css';
 
 function ModelsTable() {
@@ -9,6 +10,8 @@ function ModelsTable() {
   const [error, setError] = useState('');
   const [expandedRows, setExpandedRows] = useState(new Set());
   const [selectedModel, setSelectedModel] = useState(null);
+  const [simulationResults, setSimulationResults] = useState(null);
+  const [simulatedStocks, setSimulatedStocks] = useState(null);
 
   useEffect(() => {
     loadModels();
@@ -58,6 +61,11 @@ function ModelsTable() {
 
   const closeModal = () => {
     setSelectedModel(null);
+  };
+
+  const handleSimulationComplete = (results, stocks) => {
+    setSimulationResults(results);
+    setSimulatedStocks(stocks);
   };
 
   if (loading) {
@@ -207,8 +215,14 @@ function ModelsTable() {
         </table>
       </div>
 
+      <SimulationResults results={simulationResults} stocks={simulatedStocks} />
+
       {selectedModel && (
-        <SimulationModal model={selectedModel} onClose={closeModal} />
+        <SimulationModal
+          model={selectedModel}
+          onClose={closeModal}
+          onSimulationComplete={handleSimulationComplete}
+        />
       )}
     </div>
   );
