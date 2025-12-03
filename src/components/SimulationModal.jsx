@@ -6,6 +6,7 @@ function SimulationModal({ model, onClose, onSimulationComplete }) {
   const [simulating, setSimulating] = useState(false);
   const [error, setError] = useState('');
   const [params, setParams] = useState(getDefaultSimulationParams());
+  const [symbolsInput, setSymbolsInput] = useState(getDefaultSimulationParams().symbols.join(', '));
 
   const handleSimulate = async () => {
     try {
@@ -36,7 +37,10 @@ function SimulationModal({ model, onClose, onSimulationComplete }) {
   };
 
   const handleSymbolsChange = (value) => {
-    // Convert comma-separated string to array
+    // Store the raw input value
+    setSymbolsInput(value);
+
+    // Convert comma-separated string to array for params
     const symbols = value.split(',').map(s => s.trim()).filter(s => s);
     setParams(prev => ({
       ...prev,
@@ -85,7 +89,7 @@ function SimulationModal({ model, onClose, onSimulationComplete }) {
               <label>Stock Symbols (comma-separated)</label>
               <input
                 type="text"
-                value={params.symbols.join(', ')}
+                value={symbolsInput}
                 onChange={(e) => handleSymbolsChange(e.target.value)}
                 placeholder="AAPL, GOOGL, MSFT"
                 disabled={simulating}
